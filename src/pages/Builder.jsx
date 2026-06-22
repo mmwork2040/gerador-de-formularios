@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { 
   Plus, Settings, Code, Trash2, Copy, Check, Palette, List, Link,
   ChevronDown, ChevronUp, Monitor, Smartphone, Sparkles, Type, FileText, CheckSquare, Mail, Hash,
-  Database, HelpCircle, ChevronRight, ChevronLeft, Terminal, AlertTriangle
+  Database, HelpCircle, ChevronRight, ChevronLeft, Terminal, AlertTriangle, Calendar
 } from 'lucide-react';
 
 const PRESET_THEMES = {
@@ -575,6 +575,7 @@ create table if not exists submissions (
                       case 'number': return <Hash size={16} style={{ color: '#818cf8' }} />;
                       case 'checkbox': return <CheckSquare size={16} style={{ color: '#818cf8' }} />;
                       case 'textarea': return <FileText size={16} style={{ color: '#818cf8' }} />;
+                      case 'date': return <Calendar size={16} style={{ color: '#818cf8' }} />;
                       default: return <Type size={16} style={{ color: '#818cf8' }} />;
                     }
                   };
@@ -646,6 +647,7 @@ create table if not exists submissions (
                             <option value="text">Texto Curto</option>
                             <option value="email">E-mail</option>
                             <option value="number">Número</option>
+                            <option value="date">Data</option>
                             <option value="checkbox">Checkbox</option>
                             <option value="textarea">Texto Longo</option>
                           </select>
