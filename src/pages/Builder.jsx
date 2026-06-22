@@ -451,10 +451,18 @@ export default function Builder() {
 
   // Google Apps Script source code helper
   const googleAppsScriptCode = `// Cole este código no seu Google Apps Script (Extensões > Apps Script)
+// IMPORTANTE: Ao implantar, em "Quem tem acesso" selecione "Qualquer pessoa"
+
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = JSON.parse(e.postData.contents);
+    
+    // Ignora envio de teste
+    if (data.test === true) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Teste ok" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     
     // Cria cabeçalhos caso a planilha esteja em branco
     if (sheet.getLastRow() === 0) {
@@ -470,6 +478,12 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({ status: "error", error: error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// Necessário para responder ao redirect do Apps Script
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({ status: "ok" }))
+    .setMimeType(ContentService.MimeType.JSON);
 }`;
 
   // Supabase SQL database builder code helper
@@ -1163,11 +1177,17 @@ create table if not exists submissions (
                       </h4>
                       <ol style={{ paddingLeft: 16, fontSize: 12, lineHeight: 1.6, color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: 6 }}>
                         <li>Crie uma nova planilha no seu Google Drive.</li>
-                        <li>Clique em <b>Extensões &gt; Apps Script</b>.</li>
-                        <li>Substitua o código atual pelo código pronto abaixo.</li>
-                        <li>Clique no botão <b>Implantar &gt; Nova implantação</b>. Selecione tipo <b>Aplicativo da Web</b>, configure o acesso como <i>"Qualquer pessoa"</i> e implante.</li>
-                        <li>Copie o <b>URL do aplicativo da Web</b> gerado e cole abaixo.</li>
+                        <li>Abra a planilha e clique em <b>Extensões &gt; Apps Script</b>.</li>
+                        <li>Apague todo o código existente e cole o código abaixo.</li>
+                        <li>Clique no botão <b>Implantar &gt; Nova implantação</b>.</li>
+                        <li>Selecione tipo <b>"Aplicativo da Web"</b>, execute como <b>"Eu"</b>, e quem tem acesso <b>"Qualquer pessoa"</b>. Clique em <b>Implantar</b>.</li>
+                        <li>Autorize o acesso quando solicitado.</li>
+                        <li>Copie o <b>URL do aplicativo da Web</b> gerado (começa com <code>https://script.google.com/macros/s/</code>) e cole abaixo.</li>
                       </ol>
+
+                      <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: '#fca5a5' }}>
+                        ⚠️ <b>Importante:</b> Cole a URL do <b>Apps Script implantado</b>, NÃO a URL da planilha do Google Sheets. A URL correta começa com <code style={{ fontFamily: 'monospace', fontSize: 11 }}>https://script.google.com/macros/s/...</code>
+                      </div>
 
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
