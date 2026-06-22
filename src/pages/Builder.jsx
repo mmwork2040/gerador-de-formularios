@@ -290,10 +290,32 @@ export default function Builder() {
           setTestingConnection(false);
           return;
         }
-        await addLog('⚡ Disparando payload HTTP POST simulado...', 600);
-        await addLog(`📂 Alvo: Aba "${settings.sheetsTabName}"`, 300);
-        await addLog('✅ Conexão bem-sucedida! O script retornou HTTP 200 OK.', 600);
-        setConnectionStatus('success');
+        await addLog('✉️ Enviando payload HTTP POST real para o Google Sheets...', 500);
+        try {
+          const testData = {
+            test: true,
+            message: "Teste de conexao enviado pelo construtor FormGen Studio",
+            timestamp: new Date().toISOString(),
+            formToken: formToken
+          };
+          
+          await fetch(settings.sheetsUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(testData)
+          });
+          
+          await addLog('✅ Requisição enviada para o Google Apps Script!', 400);
+          await addLog('ℹ️ O envio é assíncrono (no-cors). Verifique se uma nova linha de teste apareceu na sua planilha.', 400);
+          setConnectionStatus('success');
+        } catch (error) {
+          console.error(error);
+          await addLog(`❌ Erro de conexão com o script do Google: ${error.message}`, 400);
+          setConnectionStatus('error');
+        }
       } 
       else if (type === 'webhook') {
         await addLog('🌐 Validando URL do Webhook...', 400);
@@ -303,9 +325,38 @@ export default function Builder() {
           setTestingConnection(false);
           return;
         }
-        await addLog('✉️ Enviando JSON de teste para o gatilho...', 600);
-        await addLog('✅ Webhook validado! Recebemos a resposta com sucesso.', 500);
-        setConnectionStatus('success');
+        await addLog('✉️ Enviando payload HTTP POST real para o Webhook...', 500);
+        try {
+          const testData = {
+            test: true,
+            message: "Teste de conexao enviado pelo construtor FormGen Studio",
+            timestamp: new Date().toISOString(),
+            formToken: formToken,
+            fieldsCount: fields.length
+          };
+          
+          const response = await fetch(settings.webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(testData)
+          });
+          
+          await addLog(`📬 Resposta do servidor: HTTP ${response.status}`, 400);
+          if (response.ok) {
+            await addLog('✅ Webhook validado! O servidor recebeu e processou o teste com sucesso.', 400);
+            setConnectionStatus('success');
+          } else {
+            await addLog(`⚠️ Webhook respondeu com status de erro ${response.status}. Verifique seu fluxo.`, 400);
+            setConnectionStatus('error');
+          }
+        } catch (error) {
+          console.error(error);
+          await addLog(`⚠️ Aviso: Requisição disparada, mas bloqueada por política de CORS/rede (${error.message}).`, 600);
+          await addLog('ℹ️ Em integradores (n8n/Make), o fluxo costuma rodar mesmo sob erro de CORS na resposta. Verifique seu painel receptor.', 400);
+          setConnectionStatus('success');
+        }
       }
       else if (type === 'email') {
         await addLog('📧 Verificando e-mail do destinatário...', 300);
