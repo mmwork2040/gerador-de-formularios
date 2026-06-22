@@ -1690,6 +1690,7 @@ create table if not exists submissions (
                             color: design.mode === 'dark' ? '#f8fafc' : '#0f172a',
                             borderColor: design.mode === 'dark' ? 'rgba(255,255,255,0.1)' : '#e2e8f0',
                             borderRadius: `${design.borderRadius}px`,
+                            colorScheme: design.mode === 'dark' ? 'dark' : 'light',
                             '--focus-ring-color': design.themeColor
                           }}
                         />

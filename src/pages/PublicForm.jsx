@@ -382,6 +382,7 @@ export default function PublicForm() {
                         color: config.design.mode === 'dark' ? '#f8fafc' : '#0f172a',
                         borderColor: config.design.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0',
                         borderRadius: `${config.design.borderRadius}px`,
+                        colorScheme: config.design.mode === 'dark' ? 'dark' : 'light',
                         '--focus-ring-color': config.design.themeColor
                       }}
                     />
