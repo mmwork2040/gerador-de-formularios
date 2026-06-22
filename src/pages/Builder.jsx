@@ -7,6 +7,46 @@ import {
 } from 'lucide-react';
 
 const PRESET_THEMES = {
+  corporate: {
+    name: 'Corporate Blue 👔',
+    gradient: 'linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%)',
+    start: '#f0f4f8',
+    end: '#d9e2ec',
+    angle: 135,
+    themeColor: '#0284c7',
+    textColor: '#1f2937',
+    mode: 'light'
+  },
+  emerald_business: {
+    name: 'Business Emerald 🌲',
+    gradient: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+    start: '#f0fdf4',
+    end: '#dcfce7',
+    angle: 135,
+    themeColor: '#059669',
+    textColor: '#1f2937',
+    mode: 'light'
+  },
+  warm_sand: {
+    name: 'Warm Sand ☀️',
+    gradient: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+    start: '#fffbeb',
+    end: '#fef3c7',
+    angle: 135,
+    themeColor: '#d97706',
+    textColor: '#1f2937',
+    mode: 'light'
+  },
+  minimal: {
+    name: 'Clean Light 🤍',
+    gradient: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+    start: '#f8fafc',
+    end: '#e2e8f0',
+    angle: 135,
+    themeColor: '#0f172a',
+    textColor: '#0f172a',
+    mode: 'light'
+  },
   cosmic: {
     name: 'Cosmic Nebula 🌌',
     gradient: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
@@ -14,36 +54,6 @@ const PRESET_THEMES = {
     end: '#ec4899',
     angle: 135,
     themeColor: '#6366f1',
-    textColor: '#ffffff',
-    mode: 'dark'
-  },
-  sunset: {
-    name: 'Sunset Flare 🌅',
-    gradient: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)',
-    start: '#f43f5e',
-    end: '#fb923c',
-    angle: 135,
-    themeColor: '#f43f5e',
-    textColor: '#ffffff',
-    mode: 'dark'
-  },
-  ocean: {
-    name: 'Ocean Breeze 🌊',
-    gradient: 'linear-gradient(135deg, #0ea5e9 0%, #22c55e 100%)',
-    start: '#0ea5e9',
-    end: '#22c55e',
-    angle: 135,
-    themeColor: '#0ea5e9',
-    textColor: '#ffffff',
-    mode: 'dark'
-  },
-  emerald: {
-    name: 'Emerald Forest 🌲',
-    gradient: 'linear-gradient(135deg, #059669 0%, #34d399 100%)',
-    start: '#059669',
-    end: '#34d399',
-    angle: 135,
-    themeColor: '#059669',
     textColor: '#ffffff',
     mode: 'dark'
   },
@@ -56,16 +66,6 @@ const PRESET_THEMES = {
     themeColor: '#ec4899',
     textColor: '#f8fafc',
     mode: 'dark'
-  },
-  minimal: {
-    name: 'Clean Light 🤍',
-    gradient: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-    start: '#f8fafc',
-    end: '#e2e8f0',
-    angle: 135,
-    themeColor: '#4f46e5',
-    textColor: '#0f172a',
-    mode: 'light'
   }
 };
 
@@ -144,16 +144,16 @@ export default function Builder() {
       bgType: 'preset',
       solidBgColor: '#f8fafc',
       gradientType: 'linear',
-      gradientColorStart: '#6366f1',
-      gradientColorEnd: '#a855f7',
+      gradientColorStart: '#0284c7',
+      gradientColorEnd: '#0369a1',
       gradientAngle: 135,
-      presetTheme: 'cosmic',
+      presetTheme: 'corporate',
 
-      themeColor: '#6366f1',
-      mode: 'dark',
-      cardStyle: 'glassmorphic',
-      borderRadius: 12,
-      shadowSize: 'md',
+      themeColor: '#0284c7',
+      mode: 'light',
+      cardStyle: 'solid',
+      borderRadius: 8,
+      shadowSize: 'sm',
       fontFamily: 'Plus Jakarta Sans',
     };
   }
@@ -1113,7 +1113,7 @@ create table if not exists submissions (
                             {appsScriptCopied ? 'Copiado!' : 'Copiar Código'}
                           </button>
                         </div>
-                        <pre style={{ background: '#05070f', padding: 12, borderRadius: 8, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', maxHeight: 120, border: '1px solid var(--border-builder)', color: '#818cf8' }}>
+                        <pre style={{ background: '#f8fafc', padding: 12, borderRadius: 8, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', maxHeight: 120, border: '1px solid var(--border-builder)', color: '#0369a1' }}>
                           {googleAppsScriptCode}
                         </pre>
                       </div>
@@ -1211,8 +1211,8 @@ create table if not exists submissions (
                       {/* Google OAuth Option fields */}
                       {settings.emailProvider === 'gmail_oauth' && (
                         <>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, background: 'rgba(251,191,36,0.02)', padding: 12, borderRadius: 8, border: '1px solid rgba(251,191,36,0.15)', fontSize: 12, color: 'var(--text-muted)' }}>
-                            <h5 style={{ fontWeight: 700, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, background: '#fffbeb', padding: 12, borderRadius: 8, border: '1px solid rgba(251,191,36,0.3)', fontSize: 12, color: 'var(--text-main)' }}>
+                            <h5 style={{ fontWeight: 700, color: '#b45309', display: 'flex', alignItems: 'center', gap: 4 }}>
                               <HelpCircle size={14} /> Passo a Passo Google Cloud Console
                             </h5>
                             <ol style={{ paddingLeft: 14, display: 'flex', flexDirection: 'column', gap: 4, lineHeight: 1.5 }}>
@@ -1223,7 +1223,7 @@ create table if not exists submissions (
                               <li>Insira a URI de redirecionamento e copie o ID e Chave Secreta abaixo.</li>
                             </ol>
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, borderTop: '1px solid var(--border-builder)', paddingTop: 12 }}>
                             <div>
                               <label className="input-label">E-mail Remetente (Sua Conta Google)</label>
                               <input 
@@ -1260,7 +1260,7 @@ create table if not exists submissions (
 
                       {/* Custom SMTP options */}
                       {settings.emailProvider === 'custom_smtp' && (
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, borderTop: '1px solid var(--border-builder)', paddingTop: 12 }}>
                           <div style={{ gridColumn: 'span 2' }}>
                             <label className="input-label">Host SMTP</label>
                             <input 
@@ -1373,9 +1373,9 @@ create table if not exists submissions (
 
                   {/* Terminal Simulation Logger */}
                   {connectionStatus && (
-                    <div style={{ marginTop: 16, background: '#05070f', border: '1px solid var(--border-builder)', borderRadius: 8, padding: 12, fontFamily: 'monospace', fontSize: 11 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6, marginBottom: 8, color: 'var(--text-muted)' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Terminal size={12} /> Terminal de Conexão</span>
+                    <div style={{ marginTop: 16, background: '#0f172a', border: '1px solid #334155', borderRadius: 8, padding: 12, fontFamily: 'monospace', fontSize: 11 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: 6, marginBottom: 8, color: '#94a3b8' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#f1f5f9' }}><Terminal size={12} /> Terminal de Conexão</span>
                         <span style={{ 
                           color: connectionStatus === 'success' ? '#10b981' : 
                                  connectionStatus === 'error' ? '#ef4444' : '#fbbf24',
@@ -1422,16 +1422,16 @@ create table if not exists submissions (
                   </div>
 
                   {/* Supabase Wizard Steps Container */}
-                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: 18, borderRadius: 12, border: '1px solid var(--border-builder)', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 10 }}>
+                  <div style={{ background: '#f8fafc', padding: 18, borderRadius: 12, border: '1px solid var(--border-builder)', marginBottom: 20 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid var(--border-builder)', paddingBottom: 10 }}>
                       <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-color)' }}>
                         Assistente de Armazenamento - Passo {wizardStep} de 4
                       </span>
                       <div style={{ display: 'flex', gap: 4 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: wizardStep >= 1 ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)' }}></span>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: wizardStep >= 2 ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)' }}></span>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: wizardStep >= 3 ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)' }}></span>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: wizardStep >= 4 ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)' }}></span>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: wizardStep >= 1 ? 'var(--accent-color)' : 'rgba(0,0,0,0.1)' }}></span>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: wizardStep >= 2 ? 'var(--accent-color)' : 'rgba(0,0,0,0.1)' }}></span>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: wizardStep >= 3 ? 'var(--accent-color)' : 'rgba(0,0,0,0.1)' }}></span>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: wizardStep >= 4 ? 'var(--accent-color)' : 'rgba(0,0,0,0.1)' }}></span>
                       </div>
                     </div>
 
@@ -1498,7 +1498,7 @@ create table if not exists submissions (
                               {sqlCopied ? 'Copiado!' : 'Copiar SQL'}
                             </button>
                           </div>
-                          <pre style={{ background: '#05070f', padding: 12, borderRadius: 8, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', maxHeight: 150, border: '1px solid var(--border-builder)', color: '#10b981' }}>
+                          <pre style={{ background: '#f8fafc', padding: 12, borderRadius: 8, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', maxHeight: 150, border: '1px solid var(--border-builder)', color: '#047857' }}>
                             {supabaseSqlCode}
                           </pre>
                         </div>
@@ -1527,7 +1527,7 @@ create table if not exists submissions (
                     )}
 
                     {/* Wizard controls footer */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20, borderTop: '1px solid var(--border-builder)', paddingTop: 12 }}>
                       <button 
                         type="button" 
                         className="btn btn-outline"
@@ -1551,9 +1551,9 @@ create table if not exists submissions (
 
                   {/* Terminal simulation for database connection */}
                   {connectionStatus && settingsTab === 'storage' && (
-                    <div style={{ background: '#05070f', border: '1px solid var(--border-builder)', borderRadius: 8, padding: 12, fontFamily: 'monospace', fontSize: 11 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6, marginBottom: 8, color: 'var(--text-muted)' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Terminal size={12} /> Log do Banco de Dados</span>
+                    <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 8, padding: 12, fontFamily: 'monospace', fontSize: 11 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: 6, marginBottom: 8, color: '#94a3b8' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#f1f5f9' }}><Terminal size={12} /> Log do Banco de Dados</span>
                         <span style={{ 
                           color: connectionStatus === 'success' ? '#10b981' : '#ef4444',
                           fontWeight: 'bold' 

@@ -17,16 +17,16 @@ export default function PublicForm() {
       bgType: 'preset',
       solidBgColor: '#f8fafc',
       gradientType: 'linear',
-      gradientColorStart: '#6366f1',
-      gradientColorEnd: '#a855f7',
+      gradientColorStart: '#0284c7',
+      gradientColorEnd: '#0369a1',
       gradientAngle: 135,
-      presetTheme: 'cosmic',
+      presetTheme: 'corporate',
 
-      themeColor: '#6366f1',
-      mode: 'dark',
-      cardStyle: 'glassmorphic',
-      borderRadius: 12,
-      shadowSize: 'md',
+      themeColor: '#0284c7',
+      mode: 'light',
+      cardStyle: 'solid',
+      borderRadius: 8,
+      shadowSize: 'sm',
       fontFamily: 'Plus Jakarta Sans',
     },
     settings: { 
@@ -114,14 +114,14 @@ export default function PublicForm() {
       styles.backgroundColor = designObj.solidBgColor;
     } else if (designObj.bgType === 'preset') {
       const presets = {
+        corporate: 'linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%)',
+        emerald_business: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+        warm_sand: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+        minimal: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
         cosmic: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
-        sunset: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)',
-        ocean: 'linear-gradient(135deg, #0ea5e9 0%, #22c55e 100%)',
-        emerald: 'linear-gradient(135deg, #059669 0%, #34d399 100%)',
-        cyberpunk: 'linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #030712 100%)',
-        minimal: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+        cyberpunk: 'linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #030712 100%)'
       };
-      styles.background = presets[designObj.presetTheme] || presets.cosmic;
+      styles.background = presets[designObj.presetTheme] || presets.corporate;
     } else {
       styles.background = `linear-gradient(${designObj.gradientAngle}deg, ${designObj.gradientColorStart} 0%, ${designObj.gradientColorEnd} 100%)`;
     }
