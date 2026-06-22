@@ -1,6 +1,13 @@
 (function() {
-  // Configuração global
-  const API_BASE_URL = 'http://localhost:5173'; // Será substituído pela URL do Vercel em prod
+  // Configuração global dinâmica (resolve baseada na URL onde o script foi carregado)
+  let scriptSrc = '';
+  if (document.currentScript) {
+    scriptSrc = document.currentScript.src;
+  } else {
+    const scripts = document.getElementsByTagName('script');
+    scriptSrc = scripts[scripts.length - 1].src;
+  }
+  const API_BASE_URL = scriptSrc ? new URL(scriptSrc).origin : 'https://vibeform-studio.vercel.app';
 
   window.FormGenSDK = {
     init: function(config) {

@@ -215,18 +215,28 @@ export default function PublicForm() {
     let body = JSON.stringify(data);
 
     try {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const proxyUrl = isLocalhost ? 'https://vibeform-studio.vercel.app/api/proxy' : '/api/proxy';
+
       if (type === 'sheets' && config.settings.sheetsUrl) {
-        await fetch(config.settings.sheetsUrl, {
+        await fetch(proxyUrl, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: headers,
-          body: body
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: config.settings.sheetsUrl,
+            method: 'POST',
+            body: data
+          })
         });
       } else if (type === 'webhook' && config.settings.webhookUrl) {
-        await fetch(config.settings.webhookUrl, {
+        await fetch(proxyUrl, {
           method: 'POST',
-          headers: headers,
-          body: body
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: config.settings.webhookUrl,
+            method: 'POST',
+            body: data
+          })
         });
       } else if (type === 'supabase' && config.settings.supabaseUrl && config.settings.supabaseAnonKey) {
         const url = `${config.settings.supabaseUrl}/rest/v1/${config.settings.supabaseTable}`;

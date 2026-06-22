@@ -290,7 +290,7 @@ export default function Builder() {
           setTestingConnection(false);
           return;
         }
-        await addLog('✉️ Enviando payload HTTP POST real para o Google Sheets...', 500);
+        await addLog('✉️ Enviando payload HTTP POST real para o Google Sheets (via proxy)...', 500);
         try {
           const testData = {
             test: true,
@@ -299,21 +299,32 @@ export default function Builder() {
             formToken: formToken
           };
           
-          await fetch(settings.sheetsUrl, {
+          const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          const proxyUrl = isLocalhost ? 'https://vibeform-studio.vercel.app/api/proxy' : '/api/proxy';
+
+          const response = await fetch(proxyUrl, {
             method: 'POST',
-            mode: 'no-cors',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(testData)
+            body: JSON.stringify({
+              url: settings.sheetsUrl,
+              method: 'POST',
+              body: testData
+            })
           });
           
-          await addLog('✅ Requisição enviada para o Google Apps Script!', 400);
-          await addLog('ℹ️ O envio é assíncrono (no-cors). Verifique se uma nova linha de teste apareceu na sua planilha.', 400);
-          setConnectionStatus('success');
+          await addLog(`📬 Resposta do script do Google: HTTP ${response.status}`, 400);
+          if (response.ok) {
+            await addLog('✅ Conexão com o Google Sheets validada!', 400);
+            setConnectionStatus('success');
+          } else {
+            await addLog(`⚠️ Google Sheets respondeu com status de erro ${response.status}.`, 400);
+            setConnectionStatus('error');
+          }
         } catch (error) {
           console.error(error);
-          await addLog(`❌ Erro de conexão com o script do Google: ${error.message}`, 400);
+          await addLog(`❌ Erro ao conectar ao proxy/script do Google: ${error.message}`, 400);
           setConnectionStatus('error');
         }
       } 
@@ -325,7 +336,7 @@ export default function Builder() {
           setTestingConnection(false);
           return;
         }
-        await addLog('✉️ Enviando payload HTTP POST real para o Webhook...', 500);
+        await addLog('✉️ Enviando payload HTTP POST real para o Webhook (via proxy)...', 500);
         try {
           const testData = {
             test: true,
@@ -335,12 +346,19 @@ export default function Builder() {
             fieldsCount: fields.length
           };
           
-          const response = await fetch(settings.webhookUrl, {
+          const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          const proxyUrl = isLocalhost ? 'https://vibeform-studio.vercel.app/api/proxy' : '/api/proxy';
+
+          const response = await fetch(proxyUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(testData)
+            body: JSON.stringify({
+              url: settings.webhookUrl,
+              method: 'POST',
+              body: testData
+            })
           });
           
           await addLog(`📬 Resposta do servidor: HTTP ${response.status}`, 400);
@@ -353,9 +371,8 @@ export default function Builder() {
           }
         } catch (error) {
           console.error(error);
-          await addLog(`⚠️ Aviso: Requisição disparada, mas bloqueada por política de CORS/rede (${error.message}).`, 600);
-          await addLog('ℹ️ Em integradores (n8n/Make), o fluxo costuma rodar mesmo sob erro de CORS na resposta. Verifique seu painel receptor.', 400);
-          setConnectionStatus('success');
+          await addLog(`❌ Erro ao conectar ao Webhook via proxy: ${error.message}`, 400);
+          setConnectionStatus('error');
         }
       }
       else if (type === 'email') {
