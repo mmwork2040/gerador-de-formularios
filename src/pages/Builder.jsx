@@ -212,6 +212,10 @@ export default function Builder() {
   };
 
   const removeField = (id) => {
+    if (fields.length <= 1) {
+      alert("O formulário deve conter pelo menos um campo!");
+      return;
+    }
     setFields(fields.filter(f => f.id !== id));
   };
 
@@ -589,7 +593,13 @@ create table if not exists submissions (
                           }}>
                             <Copy size={16} />
                           </button>
-                          <button className="icon-btn danger" title="Remover Campo" onClick={() => removeField(field.id)}>
+                          <button 
+                            className="icon-btn danger" 
+                            title={fields.length <= 1 ? "Não é possível remover o único campo" : "Remover Campo"} 
+                            onClick={() => removeField(field.id)}
+                            disabled={fields.length <= 1}
+                            style={fields.length <= 1 ? { opacity: 0.35, cursor: 'not-allowed' } : {}}
+                          >
                             <Trash2 size={16} />
                           </button>
                         </div>
