@@ -1,0 +1,414 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+export default function PublicForm() {
+  const { token } = useParams();
+  const [config, setConfig] = useState({
+    fields: [],
+    design: {
+      showHeader: true,
+      logoUrl: '',
+      logoAlignment: 'center',
+      logoSize: 'medium',
+      titleText: 'Preencha os dados',
+      subtitleText: 'Por favor, insira as informações nos campos abaixo.',
+      headerTextColor: '',
+
+      bgType: 'preset',
+      solidBgColor: '#f8fafc',
+      gradientType: 'linear',
+      gradientColorStart: '#6366f1',
+      gradientColorEnd: '#a855f7',
+      gradientAngle: 135,
+      presetTheme: 'cosmic',
+
+      themeColor: '#6366f1',
+      mode: 'dark',
+      cardStyle: 'glassmorphic',
+      borderRadius: 12,
+      shadowSize: 'md',
+      fontFamily: 'Plus Jakarta Sans',
+    },
+    settings: { 
+      destinationType: 'webhook',
+      webhookUrl: '', 
+      successMessage: 'Formulário enviado com sucesso!',
+      sheetsUrl: '',
+      sheetsTabName: 'Página1',
+      emailDest: '',
+      emailSubject: 'Novo envio de formulário',
+      emailProvider: 'formgen',
+      supabaseUrl: '',
+      supabaseAnonKey: '',
+      supabaseTable: 'submissions',
+    }
+  });
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const storedForm = localStorage.getItem(`form_${token}`);
+    
+    if (storedForm) {
+      try {
+        const parsedData = JSON.parse(storedForm);
+        setConfig({
+          fields: parsedData.fields || [],
+          design: { ...config.design, ...parsedData.design },
+          settings: { ...config.settings, ...parsedData.settings }
+        });
+      } catch (e) {
+        console.error("Erro ao ler configuração do formulário:", e);
+      }
+    } else {
+      // Mock fallback
+      setConfig(prev => ({
+        ...prev,
+        fields: [
+          { id: '1', key: 'email', type: 'email', required: true, label: 'E-mail', placeholder: 'Seu melhor e-mail' },
+          { id: '2', key: 'nome', type: 'text', required: true, label: 'Nome Completo', placeholder: 'Seu nome e sobrenome' }
+        ]
+      }));
+    }
+    
+    setLoading(false);
+  }, [token]);
+
+  // Adjust iframe size in parent window
+  useEffect(() => {
+    if (!loading) {
+      const handleResize = () => {
+        window.parent.postMessage({
+          type: 'resize-form',
+          token: token,
+          height: document.documentElement.scrollHeight || document.body.scrollHeight
+        }, '*');
+      };
+      
+      // Wait for font load and rendering
+      const timer = setTimeout(handleResize, 200);
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [loading, token, success, config]);
+
+  const getPageWrapperStyle = () => {
+    const designObj = config.design;
+    const styles = {
+      minHeight: '100vh',
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '40px 20px',
+      boxSizing: 'border-box',
+      transition: 'background 0.3s ease'
+    };
+
+    if (designObj.bgType === 'solid') {
+      styles.backgroundColor = designObj.solidBgColor;
+    } else if (designObj.bgType === 'preset') {
+      const presets = {
+        cosmic: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
+        sunset: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)',
+        ocean: 'linear-gradient(135deg, #0ea5e9 0%, #22c55e 100%)',
+        emerald: 'linear-gradient(135deg, #059669 0%, #34d399 100%)',
+        cyberpunk: 'linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #030712 100%)',
+        minimal: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+      };
+      styles.background = presets[designObj.presetTheme] || presets.cosmic;
+    } else {
+      styles.background = `linear-gradient(${designObj.gradientAngle}deg, ${designObj.gradientColorStart} 0%, ${designObj.gradientColorEnd} 100%)`;
+    }
+
+    return styles;
+  };
+
+  const getCardStyle = () => {
+    const designObj = config.design;
+    const isDark = designObj.mode === 'dark';
+    
+    const styles = {
+      fontFamily: designObj.fontFamily === 'Inter' ? 'var(--font-inter)' :
+                  designObj.fontFamily === 'Outfit' ? 'var(--font-outfit)' :
+                  designObj.fontFamily === 'Playfair Display' ? 'var(--font-playfair)' :
+                  designObj.fontFamily === 'Montserrat' ? 'var(--font-montserrat)' :
+                  designObj.fontFamily === 'Poppins' ? 'var(--font-poppins)' :
+                  designObj.fontFamily === 'Lora' ? 'var(--font-lora)' :
+                  designObj.fontFamily === 'Space Grotesk' ? 'var(--font-space)' :
+                  designObj.fontFamily === 'Cinzel' ? 'var(--font-cinzel)' : 'var(--font-jakarta)',
+      borderRadius: `${designObj.borderRadius}px`,
+      boxShadow: designObj.shadowSize === 'none' ? 'none' :
+                 designObj.shadowSize === 'sm' ? '0 4px 6px -1px rgba(0, 0, 0, 0.05)' :
+                 designObj.shadowSize === 'lg' ? '0 20px 25px -5px rgba(0, 0, 0, 0.2)' :
+                 '0 10px 15px -3px rgba(0, 0, 0, 0.1)', // md
+      padding: '40px 32px',
+      width: '100%',
+      maxWidth: '520px',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      border: '1px solid',
+      boxSizing: 'border-box'
+    };
+
+    if (designObj.cardStyle === 'glassmorphic') {
+      styles.backdropFilter = 'blur(16px)';
+      styles.WebkitBackdropFilter = 'blur(16px)';
+      if (isDark) {
+        styles.backgroundColor = 'rgba(15, 23, 42, 0.65)';
+        styles.borderColor = 'rgba(255, 255, 255, 0.08)';
+        styles.color = '#f8fafc';
+      } else {
+        styles.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+        styles.borderColor = 'rgba(0, 0, 0, 0.06)';
+        styles.color = '#0f172a';
+      }
+    } else {
+      if (isDark) {
+        styles.backgroundColor = '#1e293b';
+        styles.borderColor = '#334155';
+        styles.color = '#f8fafc';
+      } else {
+        styles.backgroundColor = '#ffffff';
+        styles.borderColor = '#e2e8f0';
+        styles.color = '#0f172a';
+      }
+    }
+
+    return styles;
+  };
+
+  const getLogoSize = () => {
+    const size = config.design.logoSize;
+    if (size === 'small') return '40px';
+    if (size === 'large') return '90px';
+    return '60px'; // medium
+  };
+
+  const getLogoAlignment = () => {
+    const align = config.design.logoAlignment;
+    if (align === 'left') return 'flex-start';
+    if (align === 'right') return 'flex-end';
+    return 'center'; // center
+  };
+
+  const getHeaderTextColor = () => {
+    if (config.design.headerTextColor) return config.design.headerTextColor;
+    return config.design.mode === 'dark' ? '#f8fafc' : '#0f172a';
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    console.log('Dados submetidos:', data);
+
+    const type = config.settings.destinationType;
+    let headers = { 'Content-Type': 'application/json' };
+    let body = JSON.stringify(data);
+
+    try {
+      if (type === 'sheets' && config.settings.sheetsUrl) {
+        await fetch(config.settings.sheetsUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: headers,
+          body: body
+        });
+      } else if (type === 'webhook' && config.settings.webhookUrl) {
+        await fetch(config.settings.webhookUrl, {
+          method: 'POST',
+          headers: headers,
+          body: body
+        });
+      } else if (type === 'supabase' && config.settings.supabaseUrl && config.settings.supabaseAnonKey) {
+        const url = `${config.settings.supabaseUrl}/rest/v1/${config.settings.supabaseTable}`;
+        await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': config.settings.supabaseAnonKey,
+            'Authorization': `Bearer ${config.settings.supabaseAnonKey}`,
+            'Prefer': 'return=representation'
+          },
+          body: body
+        });
+      } else {
+        // Local simulation / E-mail Dispatcher mockup
+        await new Promise(r => setTimeout(r, 1200));
+      }
+    } catch (err) {
+      console.error('Erro ao enviar dados do formulário público:', err);
+    }
+
+    setSubmitting(false);
+    setSuccess(true);
+    e.target.reset();
+  };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100vh', 
+        color: '#f8fafc',
+        fontFamily: 'sans-serif'
+      }}>
+        Carregando formulário...
+      </div>
+    );
+  }
+
+  return (
+    <div style={getPageWrapperStyle()}>
+      <div style={getCardStyle()}>
+        {success ? (
+          <div style={{ textAlign: 'center', padding: '24px 8px' }}>
+            <div style={{ fontSize: 64, marginBottom: 20, filter: 'drop-shadow(0 4px 12px rgba(16,185,129,0.3))' }}>✅</div>
+            <h2 style={{ 
+              fontSize: 22, 
+              fontWeight: 700, 
+              marginBottom: 12,
+              color: getHeaderTextColor() 
+            }}>
+              {config.settings.successMessage}
+            </h2>
+            <p style={{ color: getHeaderTextColor(), opacity: 0.6, fontSize: 14, marginBottom: 24 }}>
+              Sua resposta foi registrada e enviada com sucesso.
+            </p>
+            <button 
+              onClick={() => setSuccess(false)}
+              className="public-form-btn"
+              style={{
+                background: 'transparent',
+                color: config.design.themeColor,
+                border: `1px solid ${config.design.themeColor}`,
+                display: 'inline-flex',
+                width: 'auto',
+                padding: '10px 24px',
+                borderRadius: `${config.design.borderRadius}px`
+              }}
+            >
+              Enviar outra resposta
+            </button>
+          </div>
+        ) : (
+          <>
+            {config.design.showHeader && (
+              <div className="public-form-header">
+                {config.design.logoUrl && (
+                  <div className="public-form-logo-container" style={{ justifyContent: getLogoAlignment() }}>
+                    <img 
+                      src={config.design.logoUrl} 
+                      alt="Logo do formulário" 
+                      style={{ 
+                        maxHeight: getLogoSize(), 
+                        maxWidth: '100%',
+                        borderRadius: '4px' 
+                      }} 
+                    />
+                  </div>
+                )}
+                
+                <h2 className="public-form-title" style={{ color: getHeaderTextColor() }}>
+                  {config.design.titleText || 'Preencha os dados'}
+                </h2>
+                
+                {config.design.subtitleText && (
+                  <p className="public-form-subtitle" style={{ color: getHeaderTextColor(), opacity: 0.7 }}>
+                    {config.design.subtitleText}
+                  </p>
+                )}
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit}>
+              {config.fields.map(field => (
+                <div key={field.id} className="public-form-group">
+                  <label className="public-form-label" style={{ color: config.design.mode === 'dark' ? '#cbd5e1' : '#374151' }}>
+                    {field.label} {field.required && <span style={{ color: '#ef4444' }}>*</span>}
+                  </label>
+                  
+                  {field.type === 'textarea' ? (
+                    <textarea 
+                      name={field.key}
+                      required={field.required}
+                      placeholder={field.placeholder}
+                      className="public-form-input"
+                      rows="4"
+                      style={{
+                        backgroundColor: config.design.mode === 'dark' ? 'rgba(0, 0, 0, 0.25)' : '#ffffff',
+                        color: config.design.mode === 'dark' ? '#f8fafc' : '#0f172a',
+                        borderColor: config.design.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0',
+                        borderRadius: `${config.design.borderRadius}px`,
+                        '--focus-ring-color': config.design.themeColor
+                      }}
+                    ></textarea>
+                  ) : field.type === 'checkbox' ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+                      <input 
+                        type="checkbox" 
+                        name={field.key} 
+                        id={field.id}
+                        required={field.required}
+                        style={{ width: 16, height: 16, accentColor: config.design.themeColor }}
+                      />
+                      <label 
+                        htmlFor={field.id}
+                        className="public-form-checkbox-label"
+                        style={{ color: config.design.mode === 'dark' ? '#9ca3af' : '#64748b', cursor: 'pointer' }}
+                      >
+                        {field.placeholder || 'Aceito os termos'}
+                      </label>
+                    </div>
+                  ) : (
+                    <input
+                      type={field.type}
+                      name={field.key}
+                      required={field.required}
+                      placeholder={field.placeholder}
+                      className="public-form-input"
+                      style={{
+                        backgroundColor: config.design.mode === 'dark' ? 'rgba(0, 0, 0, 0.25)' : '#ffffff',
+                        color: config.design.mode === 'dark' ? '#f8fafc' : '#0f172a',
+                        borderColor: config.design.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0',
+                        borderRadius: `${config.design.borderRadius}px`,
+                        '--focus-ring-color': config.design.themeColor
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
+              
+              <button 
+                type="submit" 
+                disabled={submitting}
+                className="public-form-btn" 
+                style={{ 
+                  width: '100%', 
+                  marginTop: 16, 
+                  backgroundColor: config.design.themeColor, 
+                  color: '#ffffff',
+                  opacity: submitting ? 0.7 : 1,
+                  borderRadius: `${config.design.borderRadius}px`,
+                  boxShadow: `0 4px 12px ${config.design.themeColor}40`
+                }}
+              >
+                {submitting ? 'Enviando...' : 'Enviar Dados'}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
