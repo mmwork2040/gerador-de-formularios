@@ -423,10 +423,36 @@ export default function Builder() {
           setTestingConnection(false);
           return;
         }
-        await addLog('🔑 Verificando chaves de segurança...', 400);
-        await addLog(`📊 Verificando acesso à tabela "${settings.supabaseTable}"...`, 600);
-        await addLog('✅ Conectado ao Supabase! Direitos de INSERT validados para o formulário.', 500);
-        setConnectionStatus('success');
+        await addLog('🔑 Verificando chaves de segurança e permissões de INSERT...', 400);
+        
+        try {
+          const url = `${settings.supabaseUrl}/rest/v1/${settings.supabaseTable}`;
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': settings.supabaseAnonKey,
+              'Authorization': `Bearer ${settings.supabaseAnonKey}`,
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              form_token: formToken,
+              data: { test: true, message: "Teste de conexão do VibeForm Studio" }
+            })
+          });
+
+          if (response.ok) {
+            await addLog(`✅ Conectado ao Supabase! Direitos de INSERT na tabela "${settings.supabaseTable}" validados.`, 500);
+            setConnectionStatus('success');
+          } else {
+            const errData = await response.json().catch(() => ({}));
+            await addLog(`❌ Erro do Supabase (HTTP ${response.status}): ${errData.message || errData.hint || 'Permissão negada ou tabela inexistente'}`, 500);
+            setConnectionStatus('error');
+          }
+        } catch (err) {
+          await addLog(`❌ Falha de rede ao conectar ao Supabase: ${err.message}`, 500);
+          setConnectionStatus('error');
+        }
       }
       else if (type === 'storage_supabase') {
         await addLog('🌐 Conectando à API do Supabase...', 400);
