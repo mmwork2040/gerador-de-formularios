@@ -219,7 +219,7 @@ export default function PublicForm() {
       const proxyUrl = isLocalhost ? 'https://vibeform-studio.vercel.app/api/proxy' : '/api/proxy';
 
       if (type === 'sheets' && config.settings.sheetsUrl) {
-        await fetch(proxyUrl, {
+        const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -228,8 +228,9 @@ export default function PublicForm() {
             body: data
           })
         });
+        if (!response.ok) throw new Error(`Google Sheets HTTP Error: ${response.status}`);
       } else if (type === 'webhook' && config.settings.webhookUrl) {
-        await fetch(proxyUrl, {
+        const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -238,6 +239,7 @@ export default function PublicForm() {
             body: data
           })
         });
+        if (!response.ok) throw new Error(`Webhook HTTP Error: ${response.status}`);
       } else if (type === 'supabase' && config.settings.supabaseUrl && config.settings.supabaseAnonKey) {
         const url = `${config.settings.supabaseUrl}/rest/v1/${config.settings.supabaseTable}`;
         
@@ -247,32 +249,48 @@ export default function PublicForm() {
           data: data
         });
 
-        await fetch(url, {
+        const response = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'apikey': config.settings.supabaseAnonKey,
             'Authorization': `Bearer ${config.settings.supabaseAnonKey}`,
-            'Prefer': 'return=representation'
+            'Prefer': 'return=minimal'
           },
           body: supabaseBody
         });
+        
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(`Supabase Error: ${response.status} - ${errData.message || errData.hint || 'Unknown'}`);
+        }
       } else if (type === 'email') {
-        // E-mail delivery requires a backend service to dispatch SMTP/API requests securely.
-        // For a purely static frontend like this, we proxy the email sending through an external service like FormSpree, 
-        // or a custom serverless function. Here we just log and simulate.
-        console.warn("Envio de e-mail requer um backend. Usando simulação para testes.");
-        await new Promise(r => setTimeout(r, 1200));
+        const emailProxyUrl = isLocalhost ? 'https://vibeform-studio.vercel.app/api/send-email' : '/api/send-email';
+        const response = await fetch(emailProxyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            settings: config.settings,
+            formToken: token,
+            data: data
+          })
+        });
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(`Email Error: ${response.status} - ${errData.error || 'Failed to send'}`);
+        }
       } else {
         await new Promise(r => setTimeout(r, 1200));
       }
+
+      setSuccess(true);
+      e.target.reset();
     } catch (err) {
       console.error('Erro ao enviar dados do formulário público:', err);
+      alert('Houve um erro ao enviar o formulário. Por favor, tente novamente.\n\nDetalhes: ' + err.message);
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
-    setSuccess(true);
-    e.target.reset();
   };
 
   if (loading) {

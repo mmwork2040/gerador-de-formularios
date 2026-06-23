@@ -433,7 +433,7 @@ export default function Builder() {
               'Content-Type': 'application/json',
               'apikey': settings.supabaseAnonKey,
               'Authorization': `Bearer ${settings.supabaseAnonKey}`,
-              'Prefer': 'return=representation'
+              'Prefer': 'return=minimal'
             },
             body: JSON.stringify({
               form_token: formToken,
