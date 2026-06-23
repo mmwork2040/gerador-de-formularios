@@ -1445,8 +1445,9 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
                       </p>
                       
                       <div style={{ position: 'relative', marginBottom: 16 }}>
-                        <pre style={{ background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 6, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', border: '1px solid var(--border-builder)', color: '#34d399' }}>
-{`create table if not exists ${settings.supabaseTable || 'submissions'} (
+                        <pre style={{ background: 'var(--bg-sidebar)', padding: 12, borderRadius: 8, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', border: '1px solid var(--border-builder)', color: 'var(--text-primary)' }}>
+{`-- Execute este script no SQL Editor do Supabase
+create table if not exists ${settings.supabaseTable || 'submissions'} (
   id uuid primary key default gen_random_uuid(),
   form_token text not null,
   data jsonb not null,
@@ -1457,6 +1458,9 @@ alter table ${settings.supabaseTable || 'submissions'} enable row level security
 drop policy if exists "Allow anonymous inserts" on ${settings.supabaseTable || 'submissions'};
 create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissions'} for insert to public with check (true);`}
                         </pre>
+                        <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
+                          <i>Nota: Este script configura apenas o banco de destino das <b>respostas</b>. A tabela <code>forms</code> continua sendo usada caso você ative o salvamento na nuvem (Cloud Save) no canto superior direito.</i>
+                        </p>
                       </div>
 
                       <div>
