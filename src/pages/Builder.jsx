@@ -513,9 +513,9 @@ function doGet(e) {
 }`;
 
   // Supabase SQL database builder code helper
-  const supabaseSqlCode = `-- Cole estes scripts no editor SQL do seu painel Supabase para criar as tabelas
+  const supabaseSqlCode = `-- Cole estes scripts no editor SQL do seu painel Supabase
   
--- 1. Tabela para salvar as configurações dos formulários
+-- 1. Tabela para configurações dos formulários
 create table if not exists forms (
   id uuid primary key default gen_random_uuid(),
   token text unique not null,
@@ -525,13 +525,28 @@ create table if not exists forms (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 2. Tabela para salvar os dados preenchidos pelos usuários
+-- Habilitar RLS para forms
+alter table forms enable row level security;
+-- Política: Permitir que qualquer pessoa insira um formulário (anon)
+create policy "Allow anonymous inserts on forms" on forms for insert to anon with check (true);
+-- Política: Permitir leitura pública (opcional, dependendo do caso)
+create policy "Allow anonymous select on forms" on forms for select to anon using (true);
+
+
+-- 2. Tabela para salvar os dados preenchidos
 create table if not exists submissions (
   id uuid primary key default gen_random_uuid(),
   form_token text not null,
   data jsonb not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);`;
+);
+
+-- Habilitar RLS para submissions
+alter table submissions enable row level security;
+-- Política: Permitir que qualquer usuário público (anon) envie dados (INSERT)
+create policy "Allow anonymous inserts on submissions" on submissions for insert to anon with check (true);
+-- Nota: Não há política de SELECT para 'submissions', garantindo que usuários anônimos não possam ler os dados dos outros.
+`;
 
   // UI calculations
   const getBackgroundStyle = () => {
