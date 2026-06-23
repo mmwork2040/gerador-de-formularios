@@ -240,6 +240,13 @@ export default function PublicForm() {
         });
       } else if (type === 'supabase' && config.settings.supabaseUrl && config.settings.supabaseAnonKey) {
         const url = `${config.settings.supabaseUrl}/rest/v1/${config.settings.supabaseTable}`;
+        
+        // Match the expected table structure for Supabase (id, form_token, data, created_at)
+        const supabaseBody = JSON.stringify({
+          form_token: token,
+          data: data
+        });
+
         await fetch(url, {
           method: 'POST',
           headers: {
@@ -248,10 +255,15 @@ export default function PublicForm() {
             'Authorization': `Bearer ${config.settings.supabaseAnonKey}`,
             'Prefer': 'return=representation'
           },
-          body: body
+          body: supabaseBody
         });
+      } else if (type === 'email') {
+        // E-mail delivery requires a backend service to dispatch SMTP/API requests securely.
+        // For a purely static frontend like this, we proxy the email sending through an external service like FormSpree, 
+        // or a custom serverless function. Here we just log and simulate.
+        console.warn("Envio de e-mail requer um backend. Usando simulação para testes.");
+        await new Promise(r => setTimeout(r, 1200));
       } else {
-        // Local simulation / E-mail Dispatcher mockup
         await new Promise(r => setTimeout(r, 1200));
       }
     } catch (err) {
