@@ -1226,8 +1226,11 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
                         <li>Copie o <b>URL do aplicativo da Web</b> gerado (começa com <code>https://script.google.com/macros/s/</code>) e cole abaixo.</li>
                       </ol>
 
-                      <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: '#fca5a5' }}>
-                        ⚠️ <b>Importante:</b> Cole a URL do <b>Apps Script implantado</b>, NÃO a URL da planilha do Google Sheets. A URL correta começa com <code style={{ fontFamily: 'monospace', fontSize: 11 }}>https://script.google.com/macros/s/...</code>
+                      <div style={{ background: 'var(--bg-sidebar)', border: '1px solid rgba(245, 158, 11, 0.5)', borderLeft: '4px solid #f59e0b', borderRadius: 8, padding: '12px 14px', fontSize: 12, color: 'var(--text-primary)', display: 'flex', gap: 8 }}>
+                        <span style={{ fontSize: 16 }}>⚠️</span>
+                        <div>
+                          <b style={{ color: '#f59e0b' }}>Importante:</b> Cole a URL do <b>Apps Script implantado</b>, NÃO a URL da planilha do Google Sheets. A URL correta começa com <code style={{ fontFamily: 'monospace', fontSize: 11, background: 'rgba(0,0,0,0.05)', padding: '2px 4px', borderRadius: 4 }}>https://script.google.com/macros/s/...</code>
+                        </div>
                       </div>
 
                       <div>
