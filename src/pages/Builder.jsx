@@ -1440,9 +1440,24 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
                       <h4 style={{ fontSize: 13, fontWeight: 700, color: '#10b981', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <HelpCircle size={16} /> Instruções do Supabase
                       </h4>
-                      <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                        Insira as respostas diretamente em uma tabela do seu banco Supabase. Certifique-se de configurar políticas RLS permissivas ou habilitar a tabela como pública para receber requisições de insert via API anônima.
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: 12 }}>
+                        Para que o formulário consiga gravar dados no seu banco Supabase, crie a tabela destino e libere a permissão de inserção pública rodando o script abaixo no <b>SQL Editor</b>:
                       </p>
+                      
+                      <div style={{ position: 'relative', marginBottom: 16 }}>
+                        <pre style={{ background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 6, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', border: '1px solid var(--border-builder)', color: '#34d399' }}>
+{`create table if not exists ${settings.supabaseTable || 'submissions'} (
+  id uuid primary key default gen_random_uuid(),
+  form_token text not null,
+  data jsonb not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table ${settings.supabaseTable || 'submissions'} enable row level security;
+drop policy if exists "Allow anonymous inserts" on ${settings.supabaseTable || 'submissions'};
+create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissions'} for insert to public with check (true);`}
+                        </pre>
+                      </div>
 
                       <div>
                         <label className="input-label">Supabase URL do Projeto</label>
