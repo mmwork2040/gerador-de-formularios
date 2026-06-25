@@ -1936,8 +1936,8 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
                     type="button" 
                     className="btn btn-primary"
                     onClick={() => {
-                      const iframeSrc = \`\${window.location.origin}/f/\${formToken}\${embedHideHeader || embedTransparent ? '?' : ''}\${embedHideHeader ? 'header=0' : ''}\${embedHideHeader && embedTransparent ? '&' : ''}\${embedTransparent ? 'bg=transparent' : ''}\`;
-                      const iframeCode = \`<iframe src="\${iframeSrc}" width="100%" height="600px" frameborder="0" style="border-radius: \${design.borderRadius}px; border: none; overflow: hidden;"></iframe>\`;
+                      const iframeSrc = `${window.location.origin}/f/${formToken}${embedHideHeader || embedTransparent ? '?' : ''}${embedHideHeader ? 'header=0' : ''}${embedHideHeader && embedTransparent ? '&' : ''}${embedTransparent ? 'bg=transparent' : ''}`;
+                      const iframeCode = `<iframe src="${iframeSrc}" width="100%" height="600px" frameborder="0" style="border-radius: ${design.borderRadius}px; border: none; overflow: hidden;"></iframe>`;
                       navigator.clipboard.writeText(iframeCode);
                       setCopied(true);
                       setTimeout(() => setCopied(false), 2000);
