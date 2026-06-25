@@ -192,8 +192,9 @@ export default function Builder() {
     };
   }
 
-  const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [embedHideHeader, setEmbedHideHeader] = useState(false);
+  const [embedTransparent, setEmbedTransparent] = useState(false);
   const formToken = 'demo-form-token-123';
 
   const addField = () => {
@@ -659,19 +660,16 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
             className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           ><Settings size={16} /> Config.</button>
+          <button 
+            className={`tab-btn ${activeTab === 'publish' ? 'active' : ''}`}
+            onClick={() => setActiveTab('publish')}
+          ><Code size={16} /> Publicar</button>
         </div>
 
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <button className="btn btn-outline" onClick={() => window.open(`/f/${formToken}`, '_blank')}>
             <Link size={16} />
             Visualizar Externo
-          </button>
-          <button className="btn btn-primary" onClick={() => {
-            saveConfigToLocal();
-            setShowModal(true);
-          }}>
-            <Code size={16} />
-            Gerar Código Embed
           </button>
         </div>
       </aside>
@@ -1869,45 +1867,89 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
           </div>
         </div>
 
-      </main>
+          {activeTab === 'publish' && (
+            <div className="tab-pane active" style={{ display: 'flex', flexDirection: 'column', gap: 24, flex: 1, padding: 32 }}>
+              
+              <div style={{ padding: '0 0 16px 0', borderBottom: '1px solid var(--border-builder)' }}>
+                <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>Publicar Formulário</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.5 }}>
+                  Incorpore (embed) este formulário em qualquer site (WordPress, Wix, Webflow, etc) colando o código iFrame abaixo.
+                </p>
+              </div>
 
-      {/* Modal Embed */}
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Código de Incorporação (Embed)</h2>
-              <button className="close-btn" onClick={() => setShowModal(false)}>✕</button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>Opções de Visualização</h3>
+                <div style={{ display: 'flex', gap: 20 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14 }}>
+                    <input 
+                      type="checkbox" 
+                      checked={embedHideHeader}
+                      onChange={(e) => setEmbedHideHeader(e.target.checked)}
+                      style={{ width: 16, height: 16, accentColor: 'var(--primary)' }}
+                    />
+                    Esconder Cabeçalho (Logo e Título)
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14 }}>
+                    <input 
+                      type="checkbox" 
+                      checked={embedTransparent}
+                      onChange={(e) => setEmbedTransparent(e.target.checked)}
+                      style={{ width: 16, height: 16, accentColor: 'var(--primary)' }}
+                    />
+                    Fundo Transparente
+                  </label>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                  <label className="input-label" style={{ marginBottom: 0 }}>Código iFrame (Copie e Cole)</label>
+                  <button 
+                    type="button" 
+                    className="btn btn-primary"
+                    onClick={() => {
+                      const iframeSrc = \`\${window.location.origin}/f/\${formToken}\${embedHideHeader || embedTransparent ? '?' : ''}\${embedHideHeader ? 'header=0' : ''}\${embedHideHeader && embedTransparent ? '&' : ''}\${embedTransparent ? 'bg=transparent' : ''}\`;
+                      const iframeCode = \`<iframe src="\${iframeSrc}" width="100%" height="600px" frameborder="0" style="border-radius: \${design.borderRadius}px; border: none; overflow: hidden;"></iframe>\`;
+                      navigator.clipboard.writeText(iframeCode);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                  >
+                    {copied ? <Check size={16} /> : <Copy size={16} />}
+                    {copied ? 'Copiado!' : 'Copiar iFrame'}
+                  </button>
+                </div>
+                
+                <div style={{ position: 'relative' }}>
+                  <pre style={{ background: 'var(--bg-sidebar)', padding: 16, borderRadius: 8, fontSize: 13, fontFamily: 'monospace', overflowX: 'auto', border: '1px solid var(--border-builder)', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+{`<iframe 
+  src="${window.location.origin}/f/${formToken}${embedHideHeader || embedTransparent ? '?' : ''}${embedHideHeader ? 'header=0' : ''}${embedHideHeader && embedTransparent ? '&' : ''}${embedTransparent ? 'bg=transparent' : ''}" 
+  width="100%" 
+  height="600px" 
+  frameborder="0" 
+  style="border-radius: ${design.borderRadius}px; border: none; overflow: hidden;"
+></iframe>`}
+                  </pre>
+                </div>
+                
+                <div style={{ marginTop: 24, background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.2)', padding: 16, borderRadius: 8 }}>
+                  <h4 style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: '#3b82f6', marginBottom: 8 }}>
+                    <Code size={16} /> Avançado: Web Component SDK
+                  </h4>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: 12 }}>
+                    Se preferir, desenvolvedores podem incorporar via Script/Componente Web.
+                  </p>
+                  <pre style={{ background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 6, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', color: '#93c5fd' }}>
+{`<script src="${window.location.origin}/embed.js" async></script>
+<vibe-form token="${formToken}"></vibe-form>`}
+                  </pre>
+                </div>
+              </div>
+
             </div>
-            
-            <p style={{ marginBottom: 16, color: 'var(--text-muted)', fontSize: 13 }}>
-              Copie o código abaixo e cole dentro do corpo do seu site HTML no local onde deseja exibir o formulário.
-            </p>
-            
-            <div className="code-block">
-{`<script>
-  (function(d,t) {
-    var BASE_URL="${window.location.origin}";
-    var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-    g.src=BASE_URL+"/embed.js";
-    g.async = true;
-    s.parentNode.insertBefore(g,s);
-    g.onload=function(){
-      window.FormGenSDK.init({
-        formToken: '${formToken}',
-      })
-    }
-  })(document,"script");
-</script>`}
-            </div>
-            
-            <button className="btn btn-primary" onClick={handleCopyCode}>
-              {copied ? <Check size={16} /> : <Copy size={16} />}
-              {copied ? 'Copiado!' : 'Copiar Código de Embed'}
-            </button>
-          </div>
-        </div>
-      )}
+          )}
+
+      </main>
     </div>
   );
 }

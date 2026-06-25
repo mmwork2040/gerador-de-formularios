@@ -47,6 +47,11 @@ export default function PublicForm() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // Parse embed query params
+  const searchParams = new URLSearchParams(window.location.search);
+  const hideHeaderParam = searchParams.get('header') === '0';
+  const transparentBgParam = searchParams.get('bg') === 'transparent';
+
   useEffect(() => {
     const storedForm = localStorage.getItem(`form_${token}`);
     
@@ -110,7 +115,10 @@ export default function PublicForm() {
       transition: 'background 0.3s ease'
     };
 
-    if (designObj.bgType === 'solid') {
+    if (transparentBgParam) {
+      styles.background = 'transparent';
+      styles.padding = '10px';
+    } else if (designObj.bgType === 'solid') {
       styles.backgroundColor = designObj.solidBgColor;
     } else if (designObj.bgType === 'preset') {
       const presets = {
@@ -343,7 +351,7 @@ export default function PublicForm() {
           </div>
         ) : (
           <>
-            {config.design.showHeader && (
+            {config.design.showHeader && !hideHeaderParam && (
               <div className="public-form-header">
                 {config.design.logoUrl && (
                   <div className="public-form-logo-container" style={{ justifyContent: getLogoAlignment() }}>
