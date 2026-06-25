@@ -449,14 +449,14 @@ export default function PublicForm() {
                 style={{ 
                   width: '100%', 
                   marginTop: 16, 
-                  backgroundColor: config.design.themeColor, 
-                  color: '#ffffff',
+                  backgroundColor: config.design.submitButtonColor || config.design.themeColor, 
+                  color: config.design.submitButtonTextColor || '#ffffff',
                   opacity: submitting ? 0.7 : 1,
                   borderRadius: `${config.design.borderRadius}px`,
-                  boxShadow: `0 4px 12px ${config.design.themeColor}40`
+                  boxShadow: `0 4px 12px ${config.design.submitButtonColor || config.design.themeColor}40`
                 }}
               >
-                {submitting ? 'Enviando...' : 'Enviar Dados'}
+                {submitting ? 'Enviando...' : (config.design.submitButtonText || 'Enviar Dados')}
               </button>
             </form>
           </>

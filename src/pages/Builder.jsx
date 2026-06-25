@@ -69,7 +69,11 @@ const PRESET_THEMES = {
   }
 };
 
+import { useParams } from 'react-router-dom';
+
 export default function Builder() {
+  const { token: formToken } = useParams();
+  
   const [activeTab, setActiveTab] = useState('fields'); // fields, design, settings
   const [openSection, setOpenSection] = useState(''); // header, background, elements, typography
   const [viewportMode, setViewportMode] = useState('desktop'); // desktop, mobile
@@ -86,8 +90,7 @@ export default function Builder() {
   const [appsScriptCopied, setAppsScriptCopied] = useState(false);
 
   const [fields, setFields] = useState(() => {
-    const token = 'demo-form-token-123';
-    const stored = localStorage.getItem(`form_${token}`);
+    const stored = localStorage.getItem(`form_${formToken}`);
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
@@ -104,8 +107,7 @@ export default function Builder() {
   });
 
   const [design, setDesign] = useState(() => {
-    const token = 'demo-form-token-123';
-    const stored = localStorage.getItem(`form_${token}`);
+    const stored = localStorage.getItem(`form_${formToken}`);
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
@@ -118,8 +120,7 @@ export default function Builder() {
   });
 
   const [settings, setSettings] = useState(() => {
-    const token = 'demo-form-token-123';
-    const stored = localStorage.getItem(`form_${token}`);
+    const stored = localStorage.getItem(`form_${formToken}`);
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
@@ -156,6 +157,9 @@ export default function Builder() {
       shadowSize: 'sm',
       fontFamily: 'Plus Jakarta Sans',
       customCss: '',
+      submitButtonText: 'Enviar Dados',
+      submitButtonColor: '#0284c7',
+      submitButtonTextColor: '#ffffff',
     };
   }
 
@@ -196,7 +200,6 @@ export default function Builder() {
   const [copied, setCopied] = useState(false);
   const [embedHideHeader, setEmbedHideHeader] = useState(false);
   const [embedTransparent, setEmbedTransparent] = useState(false);
-  const formToken = 'demo-form-token-123';
 
   const addField = () => {
     setFields([...fields, {
@@ -219,6 +222,18 @@ export default function Builder() {
       return;
     }
     setFields(fields.filter(f => f.id !== id));
+  };
+
+  const moveField = (index, direction) => {
+    if (direction === 'up' && index > 0) {
+      const newFields = [...fields];
+      [newFields[index - 1], newFields[index]] = [newFields[index], newFields[index - 1]];
+      setFields(newFields);
+    } else if (direction === 'down' && index < fields.length - 1) {
+      const newFields = [...fields];
+      [newFields[index], newFields[index + 1]] = [newFields[index + 1], newFields[index]];
+      setFields(newFields);
+    }
   };
 
   const handleCopyCode = () => {
@@ -711,6 +726,24 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
                           Campo #{index + 1} ({field.key})
                         </span>
                         <div style={{ display: 'flex', gap: 6 }}>
+                          <button 
+                            className="icon-btn" 
+                            title="Mover para Cima" 
+                            onClick={() => moveField(index, 'up')}
+                            disabled={index === 0}
+                            style={index === 0 ? { opacity: 0.35, cursor: 'not-allowed' } : {}}
+                          >
+                            <ChevronUp size={16} />
+                          </button>
+                          <button 
+                            className="icon-btn" 
+                            title="Mover para Baixo" 
+                            onClick={() => moveField(index, 'down')}
+                            disabled={index === fields.length - 1}
+                            style={index === fields.length - 1 ? { opacity: 0.35, cursor: 'not-allowed' } : {}}
+                          >
+                            <ChevronDown size={16} />
+                          </button>
                           <button className="icon-btn" title="Duplicar Campo" onClick={() => {
                             const newField = { ...field, id: uuidv4(), key: `${field.key}_copia` };
                             setFields([...fields.slice(0, index + 1), newField, ...fields.slice(index + 1)]);
@@ -1164,8 +1197,54 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
                   </div>
                 )}
               </div>
+              {/* Accordion 5: Botão Enviar */}
+              <div className="design-accordion">
+                <div className="design-accordion-header" onClick={() => setOpenSection(openSection === 'submitButton' ? '' : 'submitButton')}>
+                  <span>Botão Enviar</span>
+                  {openSection === 'submitButton' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </div>
+                {openSection === 'submitButton' && (
+                  <div className="design-accordion-content" style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 16 }}>
+                    <div>
+                      <label className="input-label">Texto do Botão</label>
+                      <input 
+                        type="text" 
+                        className="input" 
+                        value={design.submitButtonText || 'Enviar Dados'} 
+                        onChange={(e) => setDesign({...design, submitButtonText: e.target.value})} 
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="input-label">Cor de Fundo do Botão</label>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <input 
+                          type="color" 
+                          value={design.submitButtonColor || '#0284c7'} 
+                          onChange={(e) => setDesign({...design, submitButtonColor: e.target.value})}
+                          style={{ width: 42, height: 42, border: 'none', borderRadius: 8, cursor: 'pointer', padding: 0 }}
+                        />
+                        <span style={{ fontSize: 13, fontFamily: 'monospace' }}>{design.submitButtonColor || '#0284c7'}</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="input-label">Cor do Texto do Botão</label>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <input 
+                          type="color" 
+                          value={design.submitButtonTextColor || '#ffffff'} 
+                          onChange={(e) => setDesign({...design, submitButtonTextColor: e.target.value})}
+                          style={{ width: 42, height: 42, border: 'none', borderRadius: 8, cursor: 'pointer', padding: 0 }}
+                        />
+                        <span style={{ fontSize: 13, fontFamily: 'monospace' }}>{design.submitButtonTextColor || '#ffffff'}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-              {/* Accordion 5: Avançado (CSS) */}
+              {/* Accordion 6: Avançado (CSS) */}
               <div className="design-accordion">
                 <div className="design-accordion-header" onClick={() => setOpenSection(openSection === 'advanced' ? '' : 'advanced')}>
                   <span>Avançado (CSS Customizado)</span>
@@ -1882,13 +1961,13 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
                     type="button" 
                     className="public-form-btn"
                     style={{ 
-                      backgroundColor: design.themeColor,
-                      color: '#ffffff',
+                      backgroundColor: design.submitButtonColor || design.themeColor,
+                      color: design.submitButtonTextColor || '#ffffff',
                       borderRadius: `${design.borderRadius}px`,
-                      boxShadow: `0 4px 12px ${design.themeColor}33`
+                      boxShadow: `0 4px 12px ${design.submitButtonColor || design.themeColor}33`
                     }}
                   >
-                    Enviar Dados
+                    {design.submitButtonText || 'Enviar Dados'}
                   </button>
                 </form>
 
