@@ -146,28 +146,27 @@ body {
 /* Tabs Switcher */
 .tabs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  background: #f1f5f9;
-  padding: 4px;
-  border-radius: 12px;
-  border: 1px solid var(--border-builder);
+  flex-direction: column;
+  gap: 6px;
+  background: transparent;
+  padding: 0;
+  border: none;
   margin-bottom: 24px;
 }
 
 .tab-btn {
-  flex: 1;
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 8px;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-muted);
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   transition: var(--transition);
 }

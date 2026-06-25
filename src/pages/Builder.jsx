@@ -71,7 +71,7 @@ const PRESET_THEMES = {
 
 export default function Builder() {
   const [activeTab, setActiveTab] = useState('fields'); // fields, design, settings
-  const [openSection, setOpenSection] = useState('header'); // header, background, elements, typography
+  const [openSection, setOpenSection] = useState(''); // header, background, elements, typography
   const [viewportMode, setViewportMode] = useState('desktop'); // desktop, mobile
 
   // Sub-tabs for Settings
