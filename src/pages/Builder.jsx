@@ -1764,6 +1764,7 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
         </div>
 
         {/* Right Column: Live Device Simulator */}
+        {activeTab !== 'publish' && (
         <div className="preview-canvas">
           <div className="device-controls">
             <button 
@@ -1894,9 +1895,10 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
             </div>
           </div>
         </div>
+        )}
 
           {activeTab === 'publish' && (
-            <div className="tab-pane active" style={{ display: 'flex', flexDirection: 'column', gap: 24, flex: 1, padding: 32 }}>
+            <div className="tab-pane active" style={{ display: 'flex', flexDirection: 'column', gap: 24, flex: 1, padding: 32, overflowY: 'auto' }}>
               
               <div style={{ padding: '0 0 16px 0', borderBottom: '1px solid var(--border-builder)' }}>
                 <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>Publicar Formulário</h2>
@@ -1968,7 +1970,7 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
                   <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: 12 }}>
                     Se preferir, desenvolvedores podem incorporar via Script/Componente Web.
                   </p>
-                  <pre style={{ background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 6, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', color: '#93c5fd' }}>
+                  <pre style={{ background: '#1e293b', padding: 12, borderRadius: 6, fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', color: '#e2e8f0' }}>
 {`<script src="${window.location.origin}/embed.js" async></script>
 <vibe-form token="${formToken}"></vibe-form>`}
                   </pre>
