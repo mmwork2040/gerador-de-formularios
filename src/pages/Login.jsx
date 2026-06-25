@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Sparkles, Mail, Lock, LogIn, Chrome } from 'lucide-react';
+import { Sparkles, Mail, Lock, LogIn } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -69,7 +69,6 @@ export default function Login() {
             style={{ width: '100%', marginBottom: 24, padding: '12px', fontSize: 15, background: '#ffffff', color: '#333', borderColor: '#e2e8f0' }}
             onClick={handleGoogleLogin}
           >
-            <Chrome size={18} style={{ color: '#4285F4' }} />
             Continuar com Google
           </button>
 

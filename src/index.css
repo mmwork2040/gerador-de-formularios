@@ -387,7 +387,7 @@ body {
   gap: 8px;
   font-size: 14px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .field-card-body {
