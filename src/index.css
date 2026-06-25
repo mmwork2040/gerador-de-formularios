@@ -146,6 +146,8 @@ body {
 /* Tabs Switcher */
 .tabs {
   display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
   background: #f1f5f9;
   padding: 4px;
   border-radius: 12px;

@@ -1930,11 +1930,15 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 }}>
                   <label className="input-label" style={{ marginBottom: 0 }}>Código iFrame (Copie e Cole)</label>
+                </div>
+                
+                <div style={{ position: 'relative' }}>
                   <button 
                     type="button" 
                     className="btn btn-primary"
+                    style={{ position: 'absolute', top: 12, right: 12, width: 'auto', padding: '6px 12px', fontSize: 12, borderRadius: 6, opacity: 0.9 }}
                     onClick={() => {
                       const iframeSrc = `${window.location.origin}/f/${formToken}${embedHideHeader || embedTransparent ? '?' : ''}${embedHideHeader ? 'header=0' : ''}${embedHideHeader && embedTransparent ? '&' : ''}${embedTransparent ? 'bg=transparent' : ''}`;
                       const iframeCode = `<iframe src="${iframeSrc}" width="100%" height="600px" frameborder="0" style="border-radius: ${design.borderRadius}px; border: none; overflow: hidden;"></iframe>`;
@@ -1943,13 +1947,10 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
                       setTimeout(() => setCopied(false), 2000);
                     }}
                   >
-                    {copied ? <Check size={16} /> : <Copy size={16} />}
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
                     {copied ? 'Copiado!' : 'Copiar iFrame'}
                   </button>
-                </div>
-                
-                <div style={{ position: 'relative' }}>
-                  <pre style={{ background: 'var(--bg-sidebar)', padding: 16, borderRadius: 8, fontSize: 13, fontFamily: 'monospace', overflowX: 'auto', border: '1px solid var(--border-builder)', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  <pre style={{ background: 'var(--bg-sidebar)', padding: '48px 16px 16px 16px', borderRadius: 8, fontSize: 13, fontFamily: 'monospace', overflowX: 'auto', border: '1px solid var(--border-builder)', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
 {`<iframe 
   src="${window.location.origin}/f/${formToken}${embedHideHeader || embedTransparent ? '?' : ''}${embedHideHeader ? 'header=0' : ''}${embedHideHeader && embedTransparent ? '&' : ''}${embedTransparent ? 'bg=transparent' : ''}" 
   width="100%" 
