@@ -679,6 +679,7 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
       <main className="main-content">
         
         {/* Left Column: Config Panel */}
+        {activeTab !== 'publish' && (
         <div className="editor-canvas">
           {activeTab === 'fields' && (
             <>
@@ -1762,6 +1763,7 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
             </>
           )}
         </div>
+        )}
 
         {/* Right Column: Live Device Simulator */}
         {activeTab !== 'publish' && (
