@@ -155,6 +155,7 @@ export default function Builder() {
       borderRadius: 8,
       shadowSize: 'sm',
       fontFamily: 'Plus Jakarta Sans',
+      customCss: '',
     };
   }
 
@@ -1158,6 +1159,33 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
                           Reset Auto
                         </button>
                       </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Accordion 5: Avançado (CSS) */}
+              <div className="design-accordion">
+                <div className="design-accordion-header" onClick={() => setOpenSection(openSection === 'advanced' ? '' : 'advanced')}>
+                  <span>Avançado (CSS Customizado)</span>
+                  {openSection === 'advanced' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </div>
+                {openSection === 'advanced' && (
+                  <div className="design-accordion-content" style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 16 }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 }}>
+                        <label className="input-label" style={{ marginBottom: 0 }}>Código CSS Puro</label>
+                      </div>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4, marginBottom: 12 }}>
+                        Este CSS será injetado diretamente na página pública do formulário. Use para sobrescrever estilos padrões ou modificar elementos específicos.
+                      </p>
+                      <textarea 
+                        className="input" 
+                        style={{ minHeight: 180, fontFamily: 'monospace', fontSize: 12, backgroundColor: 'rgba(0,0,0,0.1)', color: 'var(--text-primary)', whiteSpace: 'pre' }}
+                        placeholder={`.public-form-container {\n  /* seu css aqui */\n}`}
+                        value={design.customCss || ''}
+                        onChange={(e) => setDesign({...design, customCss: e.target.value})}
+                      />
                     </div>
                   </div>
                 )}

@@ -317,7 +317,11 @@ export default function PublicForm() {
   }
 
   return (
-    <div style={getPageWrapperStyle()}>
+    <>
+      {config.design.customCss && (
+        <style dangerouslySetInnerHTML={{ __html: config.design.customCss }} />
+      )}
+      <div className="public-form-container" style={getPageWrapperStyle()}>
       <div style={getCardStyle()}>
         {success ? (
           <div style={{ textAlign: 'center', padding: '24px 8px' }}>
@@ -459,5 +463,6 @@ export default function PublicForm() {
         )}
       </div>
     </div>
+    </>
   );
 }
