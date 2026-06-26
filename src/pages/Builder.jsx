@@ -267,7 +267,7 @@ export default function Builder() {
     // Real Supabase Cloud Save
     if (settings.storageType === 'supabase' && settings.storageSupabaseUrl && settings.storageSupabaseAnonKey) {
       try {
-        const url = `${settings.storageSupabaseUrl}/rest/v1/forms`;
+        const url = `${settings.storageSupabaseUrl}/rest/v1/forms?on_conflict=token`;
         const body = JSON.stringify({
           token: formToken,
           fields: fields,
