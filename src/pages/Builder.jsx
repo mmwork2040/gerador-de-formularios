@@ -139,7 +139,9 @@ export default function Builder() {
       logoAlignment: 'center',
       logoSize: 'medium',
       titleText: 'Preencha os dados',
+      titleAlignment: 'center',
       subtitleText: 'Por favor, insira as informações nos campos abaixo.',
+      subtitleAlignment: 'center',
       headerTextColor: '',
 
       bgType: 'preset',
@@ -858,21 +860,47 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
                       <>
                         <div>
                           <label className="input-label">Título Principal</label>
-                          <input 
-                            type="text" 
-                            className="input" 
-                            value={design.titleText} 
-                            onChange={(e) => setDesign({...design, titleText: e.target.value})} 
-                          />
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <input 
+                              type="text" 
+                              className="input" 
+                              value={design.titleText} 
+                              onChange={(e) => setDesign({...design, titleText: e.target.value})} 
+                              style={{ flex: 1 }}
+                            />
+                            <select 
+                              className="input" 
+                              value={design.titleAlignment || 'center'}
+                              onChange={(e) => setDesign({...design, titleAlignment: e.target.value})}
+                              style={{ width: '110px' }}
+                            >
+                              <option value="left">Esquerda</option>
+                              <option value="center">Centro</option>
+                              <option value="right">Direita</option>
+                            </select>
+                          </div>
                         </div>
                         <div>
                           <label className="input-label">Subtítulo / Descrição</label>
-                          <input 
-                            type="text" 
-                            className="input" 
-                            value={design.subtitleText} 
-                            onChange={(e) => setDesign({...design, subtitleText: e.target.value})} 
-                          />
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <input 
+                              type="text" 
+                              className="input" 
+                              value={design.subtitleText} 
+                              onChange={(e) => setDesign({...design, subtitleText: e.target.value})} 
+                              style={{ flex: 1 }}
+                            />
+                            <select 
+                              className="input" 
+                              value={design.subtitleAlignment || 'center'}
+                              onChange={(e) => setDesign({...design, subtitleAlignment: e.target.value})}
+                              style={{ width: '110px' }}
+                            >
+                              <option value="left">Esquerda</option>
+                              <option value="center">Centro</option>
+                              <option value="right">Direita</option>
+                            </select>
+                          </div>
                         </div>
                         
                         <div>
@@ -1894,12 +1922,12 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
                       </div>
                     )}
                     
-                    <h2 className="public-form-title" style={{ color: getHeaderTextColor() }}>
+                    <h2 className="public-form-title" style={{ color: getHeaderTextColor(), textAlign: design.titleAlignment || 'center' }}>
                       {design.titleText || 'Preencha os dados'}
                     </h2>
                     
                     {design.subtitleText && (
-                      <p className="public-form-subtitle" style={{ color: getHeaderTextColor(), opacity: 0.7 }}>
+                      <p className="public-form-subtitle" style={{ color: getHeaderTextColor(), opacity: 0.7, textAlign: design.subtitleAlignment || 'center' }}>
                         {design.subtitleText}
                       </p>
                     )}

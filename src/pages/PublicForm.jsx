@@ -371,12 +371,12 @@ export default function PublicForm() {
                   </div>
                 )}
                 
-                <h2 className="public-form-title" style={{ color: getHeaderTextColor() }}>
+                <h2 className="public-form-title" style={{ color: getHeaderTextColor(), textAlign: config.design.titleAlignment || 'center' }}>
                   {config.design.titleText || 'Preencha os dados'}
                 </h2>
                 
                 {config.design.subtitleText && (
-                  <p className="public-form-subtitle" style={{ color: getHeaderTextColor(), opacity: 0.7 }}>
+                  <p className="public-form-subtitle" style={{ color: getHeaderTextColor(), opacity: 0.7, textAlign: config.design.subtitleAlignment || 'center' }}>
                     {config.design.subtitleText}
                   </p>
                 )}
