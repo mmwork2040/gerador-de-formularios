@@ -668,6 +668,21 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
       <aside className="sidebar">
         <h2><Sparkles size={20} style={{ color: '#818cf8' }} /> FormGen Studio</h2>
         
+        <div style={{ padding: '0 24px 20px 24px' }}>
+          <button 
+            className="btn btn-primary" 
+            style={{ width: '100%', background: copied ? '#10b981' : 'var(--accent-color)', borderColor: copied ? '#10b981' : 'var(--accent-color)' }}
+            onClick={() => {
+              saveConfigToLocal();
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+          >
+            {copied ? <Check size={16} /> : <span style={{ fontSize: 16 }}>💾</span>}
+            {copied ? 'Salvo com sucesso!' : 'Salvar Alterações'}
+          </button>
+        </div>
+
         <div className="tabs">
           <button 
             className={`tab-btn ${activeTab === 'fields' ? 'active' : ''}`}
