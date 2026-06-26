@@ -2,18 +2,18 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
-import { Plus, Layout, FileText, LogOut, Sparkles, ExternalLink, Edit } from 'lucide-react';
+import { Plus, Layout, FileText, LogOut, Sparkles, ExternalLink, Edit, Trash2, Copy } from 'lucide-react';
 
 export default function Home() {
   const [forms, setForms] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const loadForms = () => {
     // Load forms from LocalStorage (keys starting with 'form_')
     const loadedForms = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key.startsWith('form_')) {
+      if (key && key.startsWith('form_')) {
         try {
           const data = JSON.parse(localStorage.getItem(key));
           const token = key.replace('form_', '');
@@ -29,11 +29,38 @@ export default function Home() {
       }
     }
     setForms(loadedForms);
+  };
+
+  useEffect(() => {
+    loadForms();
   }, []);
 
   const createNewForm = () => {
     const newToken = uuidv4();
     navigate(`/builder/${newToken}`);
+  };
+
+  const deleteForm = (token) => {
+    if (window.confirm('Tem certeza que deseja excluir este formulário? Essa ação não pode ser desfeita.')) {
+      localStorage.removeItem(`form_${token}`);
+      loadForms();
+    }
+  };
+
+  const duplicateForm = (token) => {
+    try {
+      const data = JSON.parse(localStorage.getItem(`form_${token}`));
+      if (data) {
+        if (data.design && data.design.titleText) {
+          data.design.titleText = `${data.design.titleText} (Cópia)`;
+        }
+        const newToken = uuidv4();
+        localStorage.setItem(`form_${newToken}`, JSON.stringify(data));
+        loadForms();
+      }
+    } catch (e) {
+      console.error('Error duplicating form', e);
+    }
   };
 
   const handleLogout = async () => {
@@ -95,12 +122,18 @@ export default function Home() {
                     <span>Token: {form.token.substring(0, 8)}...</span>
                   </div>
                   
-                  <div style={{ display: 'flex', gap: 12, marginTop: 'auto' }}>
-                    <button className="btn btn-outline" style={{ flex: 1, padding: '8px', fontSize: 13 }} onClick={() => navigate(`/builder/${form.token}`)}>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 'auto', flexWrap: 'wrap' }}>
+                    <button className="btn btn-primary" style={{ flex: '1 1 45%', padding: '8px', fontSize: 13 }} onClick={() => navigate(`/builder/${form.token}`)}>
                       <Edit size={14} /> Editar
                     </button>
-                    <button className="btn btn-outline" style={{ flex: 1, padding: '8px', fontSize: 13 }} onClick={() => window.open(`/f/${form.token}`, '_blank')}>
+                    <button className="btn btn-outline" style={{ flex: '1 1 45%', padding: '8px', fontSize: 13 }} onClick={() => window.open(`/f/${form.token}`, '_blank')}>
                       <ExternalLink size={14} /> Ver Ao Vivo
+                    </button>
+                    <button className="btn btn-outline" style={{ flex: '1 1 45%', padding: '8px', fontSize: 13 }} onClick={() => duplicateForm(form.token)}>
+                      <Copy size={14} /> Duplicar
+                    </button>
+                    <button className="btn btn-outline" style={{ flex: '1 1 45%', padding: '8px', fontSize: 13, color: 'var(--danger-color)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={() => deleteForm(form.token)}>
+                      <Trash2 size={14} /> Excluir
                     </button>
                   </div>
                 </div>
