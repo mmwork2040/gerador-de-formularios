@@ -143,11 +143,13 @@ export default function PublicForm() {
     const designObj = config.design;
     const styles = {
       minHeight: '100vh',
+      height: '100vh',
       width: '100%',
+      overflowY: 'auto',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       justifyContent: 'center',
-      padding: '40px 20px',
+      padding: transparentBgParam ? '10px' : '40px 20px',
       boxSizing: 'border-box',
       transition: 'background 0.3s ease'
     };
@@ -195,6 +197,7 @@ export default function PublicForm() {
       padding: '40px 32px',
       width: '100%',
       maxWidth: '520px',
+      margin: 'auto', // Centers the card within the flex-start wrapper when it's shorter than viewport
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       border: '1px solid',
       boxSizing: 'border-box'
