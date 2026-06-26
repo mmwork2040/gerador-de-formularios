@@ -191,9 +191,10 @@ export default function PublicForm() {
   };
 
   const getLogoSize = () => {
-    const size = config.design.logoSize;
-    if (size === 'small') return '40px';
-    if (size === 'large') return '90px';
+    const size = parseInt(config.design.logoSize);
+    if (!isNaN(size)) return `${size}px`;
+    if (config.design.logoSize === 'small') return '40px';
+    if (config.design.logoSize === 'large') return '90px';
     return '60px'; // medium
   };
 

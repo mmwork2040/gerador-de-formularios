@@ -137,7 +137,7 @@ export default function Builder() {
       showHeader: true,
       logoUrl: '',
       logoAlignment: 'center',
-      logoSize: 'medium',
+      logoSize: 60,
       titleText: 'Preencha os dados',
       titleAlignment: 'center',
       subtitleText: 'Por favor, insira as informações nos campos abaixo.',
@@ -632,6 +632,8 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
   };
 
   const getLogoSize = () => {
+    const size = parseInt(design.logoSize);
+    if (!isNaN(size)) return `${size}px`;
     if (design.logoSize === 'small') return '40px';
     if (design.logoSize === 'large') return '90px';
     return '60px';
@@ -967,16 +969,18 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
                               </select>
                             </div>
                             <div>
-                              <label className="input-label">Tamanho da Logo</label>
-                              <select 
-                                className="input" 
-                                value={design.logoSize}
-                                onChange={(e) => setDesign({...design, logoSize: e.target.value})}
-                              >
-                                <option value="small">Pequeno</option>
-                                <option value="medium">Médio</option>
-                                <option value="large">Grande</option>
-                              </select>
+                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <label className="input-label">Tamanho da Logo</label>
+                                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{!isNaN(parseInt(design.logoSize)) ? design.logoSize : (design.logoSize === 'large' ? 90 : design.logoSize === 'small' ? 40 : 60)}px</span>
+                              </div>
+                              <input 
+                                type="range" 
+                                min="30" 
+                                max="180" 
+                                value={!isNaN(parseInt(design.logoSize)) ? design.logoSize : (design.logoSize === 'large' ? 90 : design.logoSize === 'small' ? 40 : 60)}
+                                onChange={(e) => setDesign({...design, logoSize: parseInt(e.target.value)})}
+                                style={{ width: '100%', accentColor: 'var(--accent-color)' }}
+                              />
                             </div>
                           </div>
                         )}
