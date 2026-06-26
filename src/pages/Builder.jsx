@@ -267,24 +267,49 @@ export default function Builder() {
     // Real Supabase Cloud Save
     if (settings.storageType === 'supabase' && settings.storageSupabaseUrl && settings.storageSupabaseAnonKey) {
       try {
-        const url = `${settings.storageSupabaseUrl}/rest/v1/forms?on_conflict=token`;
-        const body = JSON.stringify({
+        const queryUrl = `${settings.storageSupabaseUrl}/rest/v1/forms?token=eq.${formToken}&select=id`;
+        const queryRes = await fetch(queryUrl, {
+          headers: {
+            'apikey': settings.storageSupabaseAnonKey,
+            'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`
+          }
+        });
+        
+        const bodyStr = JSON.stringify({
           token: formToken,
           fields: fields,
           design: design,
           settings: settings
         });
 
-        await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': settings.storageSupabaseAnonKey,
-            'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`,
-            'Prefer': 'resolution=merge-duplicates'
-          },
-          body: body
-        });
+        if (queryRes.ok) {
+          const data = await queryRes.json();
+          if (data && data.length > 0) {
+            // EXISTS: PATCH
+            await fetch(`${settings.storageSupabaseUrl}/rest/v1/forms?token=eq.${formToken}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': settings.storageSupabaseAnonKey,
+                'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`,
+                'Prefer': 'return=minimal'
+              },
+              body: bodyStr
+            });
+          } else {
+            // NOT EXISTS: POST
+            await fetch(`${settings.storageSupabaseUrl}/rest/v1/forms`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': settings.storageSupabaseAnonKey,
+                'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`,
+                'Prefer': 'return=minimal'
+              },
+              body: bodyStr
+            });
+          }
+        }
       } catch (e) {
         console.error('Erro ao sincronizar com Supabase Cloud', e);
       }
@@ -509,13 +534,72 @@ export default function Builder() {
           setTestingConnection(false);
           return;
         }
-        await addLog('🛠️ Verificando existência da tabela "forms" para configurações...', 700);
-        await addLog('🛠️ Verificando existência da tabela "submissions" para as respostas...', 500);
-        await addLog('✅ Sincronização Cloud Ativada! Suas configurações agora são salvas na nuvem.', 600);
+        await addLog('🛠️ Lendo/Escrevendo na tabela "forms" para configurações...', 700);
         
-        // Save choice
-        setSettings(prev => ({ ...prev, storageType: 'supabase' }));
-        setConnectionStatus('success');
+        try {
+          const queryUrl = `${settings.storageSupabaseUrl}/rest/v1/forms?token=eq.${formToken}&select=id`;
+          const queryRes = await fetch(queryUrl, {
+            headers: {
+              'apikey': settings.storageSupabaseAnonKey,
+              'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`
+            }
+          });
+          
+          if (!queryRes.ok) {
+            const errData = await queryRes.json().catch(() => ({}));
+            await addLog(`❌ Erro do Supabase (HTTP ${queryRes.status}): ${errData.message || errData.hint || 'A tabela forms não existe ou permissão negada.'}`, 500);
+            setConnectionStatus('error');
+            setTestingConnection(false);
+            return;
+          }
+
+          const bodyStr = JSON.stringify({
+            token: formToken,
+            fields: fields,
+            design: design,
+            settings: settings
+          });
+
+          let actionRes;
+          const data = await queryRes.json();
+          if (data && data.length > 0) {
+            actionRes = await fetch(`${settings.storageSupabaseUrl}/rest/v1/forms?token=eq.${formToken}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': settings.storageSupabaseAnonKey,
+                'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`,
+                'Prefer': 'return=minimal'
+              },
+              body: bodyStr
+            });
+          } else {
+            actionRes = await fetch(`${settings.storageSupabaseUrl}/rest/v1/forms`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': settings.storageSupabaseAnonKey,
+                'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`,
+                'Prefer': 'return=minimal'
+              },
+              body: bodyStr
+            });
+          }
+
+          if (actionRes.ok) {
+            await addLog('✅ Sincronização Cloud Ativada e Validada! Suas configurações foram salvas.', 600);
+            setSettings(prev => ({ ...prev, storageType: 'supabase' }));
+            setConnectionStatus('success');
+          } else {
+            const errData = await actionRes.json().catch(() => ({}));
+            await addLog(`❌ Erro ao salvar na tabela forms (HTTP ${actionRes.status}): ${errData.message || errData.hint}`, 500);
+            setConnectionStatus('error');
+          }
+
+        } catch (err) {
+          await addLog(`❌ Falha de rede ao conectar ao Supabase: ${err.message}`, 500);
+          setConnectionStatus('error');
+        }
       }
 
       setTestingConnection(false);
@@ -1856,22 +1940,6 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
                           className="btn btn-primary"
                           disabled={testingConnection}
                           onClick={() => {
-                            // Perform sync request
-                            if (settings.storageType === 'supabase') {
-                              fetch(`${settings.storageSupabaseUrl}/rest/v1/forms?form_token=eq.${formToken}`, {
-                                method: 'PATCH',
-                                headers: {
-                                  'apikey': settings.storageSupabaseAnonKey,
-                                  'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`,
-                                  'Content-Type': 'application/json',
-                                  'Prefer': 'return=representation'
-                                },
-                                body: JSON.stringify({ 
-                                  design: design,
-                                  fields: fields
-                                })
-                              });
-                            }
                             testConnection('storage_supabase');
                           }}
                         >
