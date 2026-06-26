@@ -249,8 +249,11 @@ export default function PublicForm() {
           })
         });
         if (!response.ok) throw new Error(`Webhook HTTP Error: ${response.status}`);
-      } else if (type === 'supabase' && config.settings.supabaseUrl && config.settings.supabaseAnonKey) {
-        const url = `${config.settings.supabaseUrl}/rest/v1/${config.settings.supabaseTable}`;
+      } else if (type === 'supabase') {
+        if (!config.settings.supabaseUrl || !config.settings.supabaseAnonKey) {
+           throw new Error('As credenciais do Supabase (URL ou Anon Key) não foram configuradas neste formulário.');
+        }
+        const url = `${config.settings.supabaseUrl}/rest/v1/${config.settings.supabaseTable || 'submissions'}`;
         
         // Match the expected table structure for Supabase (id, form_token, data, created_at)
         const supabaseBody = JSON.stringify({
