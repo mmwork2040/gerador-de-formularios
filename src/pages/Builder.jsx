@@ -260,8 +260,35 @@ export default function Builder() {
     saveConfigToLocal();
   };
 
-  const saveConfigToLocal = () => {
-    localStorage.setItem(`form_${formToken}`, JSON.stringify({ fields, design, settings }));
+  const saveConfigToLocal = async () => {
+    const configData = { fields, design, settings };
+    localStorage.setItem(`form_${formToken}`, JSON.stringify(configData));
+
+    // Real Supabase Cloud Save
+    if (settings.storageType === 'supabase' && settings.storageSupabaseUrl && settings.storageSupabaseAnonKey) {
+      try {
+        const url = `${settings.storageSupabaseUrl}/rest/v1/forms`;
+        const body = JSON.stringify({
+          token: formToken,
+          fields: fields,
+          design: design,
+          settings: settings
+        });
+
+        await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': settings.storageSupabaseAnonKey,
+            'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`,
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: body
+        });
+      } catch (e) {
+        console.error('Erro ao sincronizar com Supabase Cloud', e);
+      }
+    }
   };
 
   useEffect(() => {
@@ -1828,7 +1855,25 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
                           type="button" 
                           className="btn btn-primary"
                           disabled={testingConnection}
-                          onClick={() => testConnection('storage_supabase')}
+                          onClick={() => {
+                            // Perform sync request
+                            if (settings.storageType === 'supabase') {
+                              fetch(`${settings.storageSupabaseUrl}/rest/v1/forms?form_token=eq.${formToken}`, {
+                                method: 'PATCH',
+                                headers: {
+                                  'apikey': settings.storageSupabaseAnonKey,
+                                  'Authorization': `Bearer ${settings.storageSupabaseAnonKey}`,
+                                  'Content-Type': 'application/json',
+                                  'Prefer': 'return=representation'
+                                },
+                                body: JSON.stringify({ 
+                                  design: design,
+                                  fields: fields
+                                })
+                              });
+                            }
+                            testConnection('storage_supabase');
+                          }}
                         >
                           {testingConnection ? 'Estabelecendo conexão...' : '⚡ Testar e Sincronizar com Cloud'}
                         </button>
@@ -2075,7 +2120,7 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
                     className="btn btn-primary"
                     style={{ position: 'absolute', top: 12, right: 12, width: 'auto', padding: '6px 12px', fontSize: 12, borderRadius: 6, opacity: 0.9 }}
                     onClick={() => {
-                      const iframeSrc = `${window.location.origin}/f/${formToken}${embedHideHeader || embedTransparent ? '?' : ''}${embedHideHeader ? 'header=0' : ''}${embedHideHeader && embedTransparent ? '&' : ''}${embedTransparent ? 'bg=transparent' : ''}`;
+                      const iframeSrc = `${window.location.origin}/f/${formToken}${settings.storageType === 'supabase' && settings.storageSupabaseUrl ? `?db=${encodeURIComponent(settings.storageSupabaseUrl)}&key=${encodeURIComponent(settings.storageSupabaseAnonKey)}` : ''}${embedHideHeader || embedTransparent ? (settings.storageType === 'supabase' && settings.storageSupabaseUrl ? '&' : '?') : ''}${embedHideHeader ? 'header=0' : ''}${embedHideHeader && embedTransparent ? '&' : ''}${embedTransparent ? 'bg=transparent' : ''}`;
                       const iframeCode = `<iframe src="${iframeSrc}" width="100%" height="600px" frameborder="0" style="border-radius: ${design.borderRadius}px; border: none; overflow: hidden;"></iframe>`;
                       navigator.clipboard.writeText(iframeCode);
                       setCopied(true);
@@ -2087,7 +2132,7 @@ create policy "Allow anonymous inserts" on ${settings.supabaseTable || 'submissi
                   </button>
                   <pre style={{ background: 'var(--bg-sidebar)', padding: '48px 16px 16px 16px', borderRadius: 8, fontSize: 13, fontFamily: 'monospace', overflowX: 'auto', border: '1px solid var(--border-builder)', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
 {`<iframe 
-  src="${window.location.origin}/f/${formToken}${embedHideHeader || embedTransparent ? '?' : ''}${embedHideHeader ? 'header=0' : ''}${embedHideHeader && embedTransparent ? '&' : ''}${embedTransparent ? 'bg=transparent' : ''}" 
+  src="${window.location.origin}/f/${formToken}${settings.storageType === 'supabase' && settings.storageSupabaseUrl ? `?db=${encodeURIComponent(settings.storageSupabaseUrl)}&key=${encodeURIComponent(settings.storageSupabaseAnonKey)}` : ''}${embedHideHeader || embedTransparent ? (settings.storageType === 'supabase' && settings.storageSupabaseUrl ? '&' : '?') : ''}${embedHideHeader ? 'header=0' : ''}${embedHideHeader && embedTransparent ? '&' : ''}${embedTransparent ? 'bg=transparent' : ''}" 
   width="100%" 
   height="600px" 
   frameborder="0" 

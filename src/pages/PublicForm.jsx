@@ -51,33 +51,70 @@ export default function PublicForm() {
   const searchParams = new URLSearchParams(window.location.search);
   const hideHeaderParam = searchParams.get('header') === '0';
   const transparentBgParam = searchParams.get('bg') === 'transparent';
+  const dbUrl = searchParams.get('db');
+  const dbKey = searchParams.get('key');
 
   useEffect(() => {
-    const storedForm = localStorage.getItem(`form_${token}`);
-    
-    if (storedForm) {
-      try {
-        const parsedData = JSON.parse(storedForm);
-        setConfig({
-          fields: parsedData.fields || [],
-          design: { ...config.design, ...parsedData.design },
-          settings: { ...config.settings, ...parsedData.settings }
-        });
-      } catch (e) {
-        console.error("Erro ao ler configuração do formulário:", e);
+    const loadConfig = async () => {
+      // If we have DB credentials in URL, try to load from Supabase Cloud
+      if (dbUrl && dbKey) {
+        try {
+          const url = `${dbUrl}/rest/v1/forms?token=eq.${token}&select=*`;
+          const response = await fetch(url, {
+            headers: {
+              'apikey': dbKey,
+              'Authorization': `Bearer ${dbKey}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+              const parsedData = data[0];
+              setConfig({
+                fields: parsedData.fields || [],
+                design: { ...config.design, ...parsedData.design },
+                settings: { ...config.settings, ...parsedData.settings }
+              });
+              setLoading(false);
+              return; // Successfully loaded from cloud
+            }
+          }
+        } catch (e) {
+          console.error("Erro ao carregar do Supabase Cloud:", e);
+        }
       }
-    } else {
-      // Mock fallback
-      setConfig(prev => ({
-        ...prev,
-        fields: [
-          { id: '1', key: 'email', type: 'email', required: true, label: 'E-mail', placeholder: 'Seu melhor e-mail' },
-          { id: '2', key: 'nome', type: 'text', required: true, label: 'Nome Completo', placeholder: 'Seu nome e sobrenome' }
-        ]
-      }));
-    }
-    
-    setLoading(false);
+
+      // Fallback to LocalStorage
+      const storedForm = localStorage.getItem(`form_${token}`);
+      
+      if (storedForm) {
+        try {
+          const parsedData = JSON.parse(storedForm);
+          setConfig({
+            fields: parsedData.fields || [],
+            design: { ...config.design, ...parsedData.design },
+            settings: { ...config.settings, ...parsedData.settings }
+          });
+        } catch (e) {
+          console.error("Erro ao ler configuração do formulário:", e);
+        }
+      } else {
+        // Mock fallback
+        setConfig(prev => ({
+          ...prev,
+          fields: [
+            { id: '1', key: 'email', type: 'email', required: true, label: 'E-mail', placeholder: 'Seu melhor e-mail' },
+            { id: '2', key: 'nome', type: 'text', required: true, label: 'Nome Completo', placeholder: 'Seu nome e sobrenome' }
+          ]
+        }));
+      }
+      
+      setLoading(false);
+    };
+
+    loadConfig();
   }, [token]);
 
   // Adjust iframe size in parent window
