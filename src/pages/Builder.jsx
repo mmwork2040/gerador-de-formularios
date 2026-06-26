@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { 
   Plus, Settings, Code, Trash2, Copy, Check, Palette, List, Link,
   ChevronDown, ChevronUp, Monitor, Smartphone, Sparkles, Type, FileText, CheckSquare, Mail, Hash,
-  Database, HelpCircle, ChevronRight, ChevronLeft, Terminal, AlertTriangle, Calendar
+  Database, HelpCircle, ChevronRight, ChevronLeft, Terminal, AlertTriangle, Calendar, ArrowLeft
 } from 'lucide-react';
 
 const PRESET_THEMES = {
@@ -69,10 +69,11 @@ const PRESET_THEMES = {
   }
 };
 
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export default function Builder() {
   const { token: formToken } = useParams();
+  const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState('fields'); // fields, design, settings
   const [openSection, setOpenSection] = useState(''); // header, background, elements, typography
@@ -687,6 +688,10 @@ create policy "Allow anonymous inserts on submissions" on submissions for insert
         </div>
 
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <button className="btn btn-outline" onClick={() => navigate('/')}>
+            <ArrowLeft size={16} />
+            Dashboard
+          </button>
           <button className="btn btn-outline" onClick={() => window.open(`/f/${formToken}`, '_blank')}>
             <Link size={16} />
             Visualizar Externo
